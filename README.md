@@ -9,7 +9,7 @@ npm install
 npm start
 ```
 
-Abrí http://localhost:3000 — usuario `admin` / `admin123`.
+Abrí http://localhost:3000 — usuario `admin` (la clave la gestionás en Ajustes → Equipo).
 En local guarda todo en `data.sqlite` (no se sube a git).
 
 ## Subir a GitHub + Vercel (para tus moderadores)

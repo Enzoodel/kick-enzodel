@@ -249,6 +249,14 @@ app.delete('/api/users/:id', auth, adminOnly, async (req, res) => {
   await run('DELETE FROM users WHERE id = ?', req.params.id);
   res.json({ ok: true });
 });
+app.put('/api/users/:id/password', auth, adminOnly, async (req, res) => {
+  const password = String(req.body?.password || '');
+  if (password.length < 4) return res.status(400).json({ error: 'Mínimo 4 caracteres' });
+  const u = await get('SELECT id FROM users WHERE id = ?', req.params.id);
+  if (!u) return res.status(404).json({ error: 'No existe' });
+  await run('UPDATE users SET pass_hash = ? WHERE id = ?', bcrypt.hashSync(password, 10), req.params.id);
+  res.json({ ok: true });
+});
 
 app.get('/api/casinos', auth, async (req, res) => {
   const rows = await all('SELECT * FROM casinos ORDER BY nombre');

@@ -225,10 +225,14 @@ async function renderConfig() {
   if (!isAdmin) return;
   const users = await api('/api/users');
   $('users-list').innerHTML = users.map(u =>
-    `<li><span>${u.role === 'admin' ? '<span class="pill gold">administrador</span>' : '<span class="pill">moderador</span>'} <b>${esc(u.username)}</b></span>
-    ${u.username !== me.username ? `<button class="del" data-deluser="${u.id}">Quitar acceso</button>` : '<span class="pill">tu cuenta</span>'}</li>`
+    `<li data-uid="${u.id}"><span>${u.role === 'admin' ? '<span class="pill gold">administrador</span>' : '<span class="pill">moderador</span>'} <b>${esc(u.username)}</b>${u.username === me.username ? ' <span class="pill">tu cuenta</span>' : ''}</span>
+    <span class="u-actions" style="display:flex;gap:6px;align-items:center">
+      <button class="row-btn" data-pw="${u.id}">Clave</button>
+      ${u.username !== me.username ? `<button class="del" data-deluser="${u.id}">Quitar acceso</button>` : ''}
+    </span></li>`
   ).join('');
   $('users-list').querySelectorAll('[data-deluser]').forEach(b => b.onclick = () => delUser(Number(b.dataset.deluser)));
+  $('users-list').querySelectorAll('[data-pw]').forEach(b => b.onclick = () => pwEditor(Number(b.dataset.pw)));
   $('config-casino-list').innerHTML = casinos.map(c =>
     `<li><span style="display:flex;gap:10px;align-items:center">${c.logo ? `<img src="${c.logo}" class="logo-thumb" alt="">` : ph(c.nombre)}<span><b>${esc(c.nombre)}</b><br><span class="pill">${fmtN(c.resumen.ftd)} FTD · ${fmt$(c.resumen.total_monto)}</span></span></span>
     <span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
@@ -303,6 +307,21 @@ async function delUser(id) {
   if (!await confirmDlg('Quitar acceso', 'Esa persona perderá el acceso al panel.', 'Quitar')) return;
   await api('/api/users/' + id, { method: 'DELETE' }); renderConfig();
   toast('Acceso retirado');
+}
+function pwEditor(id) {
+  const box = document.querySelector(`#users-list li[data-uid="${id}"] .u-actions`);
+  if (!box || box.dataset.editing) return;
+  box.dataset.editing = '1';
+  box.innerHTML = `<input type="password" id="pw-${id}" placeholder="Nueva clave" style="width:150px"><button class="primary row-btn" id="pwok-${id}">Guardar</button><button class="row-btn" id="pwno-${id}">Cancelar</button>`;
+  $('pwok-' + id).onclick = async () => {
+    try {
+      await api(`/api/users/${id}/password`, { method: 'PUT', body: JSON.stringify({ password: $('pw-' + id).value }) });
+      toast('Clave actualizada');
+      renderConfig();
+    } catch (e) { toast('No se pudo', e.message, 'err'); }
+  };
+  $('pwno-' + id).onclick = () => renderConfig();
+  $('pw-' + id).focus();
 }
 async function delCasino(id, nombre) {
   if (!await confirmDlg('Eliminar plataforma', `"${nombre}": sus cuentas y su historial se borrarán.`, 'Eliminar')) return;
