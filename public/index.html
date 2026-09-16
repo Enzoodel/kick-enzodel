@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101114">
+<title>Kick Enzodel</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='21' fill='none' stroke='%23c2a15f' stroke-width='3'/%3E%3Ctext x='24' y='32' font-family='Georgia' font-size='20' fill='%23c2a15f' text-anchor='middle'%3ET%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-view" class="center">
+  <div class="card login-card">
+    <svg class="crest" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="none" stroke="#c2a15f" stroke-width="2.5"/><circle cx="24" cy="24" r="14" fill="none" stroke="#c2a15f" stroke-width="1.5" stroke-dasharray="4 3"/><text x="24" y="31" font-family="Georgia" font-size="18" fill="#e3c98c" text-anchor="middle">T</text></svg>
+    <span class="eyebrow">Acceso privado</span>
+    <h1 style="margin:6px 0 4px">Enzodel</h1>
+    <p class="muted small" style="margin:0">Gestión de plataformas · FTD · redepósitos · historial</p>
+    <hr class="login-rule">
+    <div class="field"><label class="lbl" for="login-user">Usuario</label><input id="login-user" placeholder="Tu usuario" autocomplete="username"></div>
+    <div class="field"><label class="lbl" for="login-pass">Contraseña</label><input id="login-pass" type="password" placeholder="Tu contraseña" autocomplete="current-password"></div>
+    <button id="btn-login" class="primary">Iniciar sesión</button>
+    <div id="login-error" class="login-error-box"></div>
+    <p class="muted small">Acceso inicial: <b>admin / admin123</b></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-view" class="hidden">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <svg class="crest" viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="none" stroke="#c2a15f" stroke-width="2.5"/><circle cx="24" cy="24" r="14" fill="none" stroke="#c2a15f" stroke-width="1.5" stroke-dasharray="4 3"/><text x="24" y="31" font-family="Georgia" font-size="18" fill="#e3c98c" text-anchor="middle">T</text></svg>
+        <div><b>Enzodel</b><span>Gestión</span></div>
+      </div>
+      <div class="side-sec">
+        <span class="side-label">Navegación</span>
+        <nav class="pill-nav">
+          <button id="nav-panel" class="nav-btn active">Resumen</button>
+          <button id="nav-config" class="nav-btn">Ajustes</button>
+        </nav>
+      </div>
+      <div class="side-sec">
+        <span class="side-label">Vista</span>
+        <button id="tab-general" class="plat-pill active">
+          <span class="ph">∑</span>
+          <span class="grow"><b>General</b><br><small id="g-tab-total">$0</small></span>
+        </button>
+      </div>
+      <div class="side-sec">
+        <span class="side-label">Plataformas <span class="count" id="casino-count">0</span></span>
+        <div id="casino-list"></div>
+      </div>
+      <div class="side-foot">
+        <div class="side-user"><span class="avatar" id="side-avatar">–</span><div><b id="side-user">—</b><span id="side-role">—</span></div></div>
+        <button id="btn-logout" class="ghost"><svg class="ic" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Cerrar sesión</button>
+      </div>
+    </aside>
+    <div class="main-col">
+      <div class="topstrip">
+      <div class="top-right">
+        <div class="clock"><b id="clock-time">--:--</b><span id="clock-date">—</span></div>
+        <div class="dd">
+          <button id="user-menu-btn" class="ghost"><svg class="ic" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span id="user-menu-label">—</span></button>
+          <div id="user-menu" class="dd-menu hidden">
+            <button id="menu-go-panel">Ir al resumen</button>
+            <button id="menu-go-config">Ajustes</button>
+            <button id="menu-logout">Cerrar sesión</button>
+          </div>
+        </div>
+        <button id="btn-add" class="primary"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Añadir</button>
+      </div>
+      </div>
+
+  <div class="wrap">
+    <div class="page-head"><span class="eyebrow" id="page-eyebrow">Panel general</span><h2 id="page-title">Enzodel</h2><p id="page-sub" class="muted">Todas las plataformas</p></div>
+
+    <!-- VISTA PANEL -->
+    <div id="view-panel">
+
+      <div id="general-view">
+        <div class="statement">
+          <span class="eyebrow">Total general · USD</span>
+          <div class="total" id="vault-amount">$0</div>
+          <p class="muted" id="vault-sub" style="margin:8px 0 0">—</p>
+        </div>
+        <div class="figs">
+          <div class="fig"><span class="cap">FTD · cuentas</span><b id="g2-ftd">0</b><span class="sub">con depósitos</span></div>
+          <div class="fig"><span class="cap">Depósitos · USD</span><b id="g2-monto">$0</b><span class="sub">monto total</span></div>
+          <div class="fig"><span class="cap">Movimientos</span><b id="g2-ops">0</b><span class="sub">operaciones</span></div>
+          <div class="fig"><span class="cap">Redepósitos</span><b id="g2-red">0</b><span class="sub" id="g2-rate">tasa 0%</span></div>
+        </div>
+        <div class="sec-head"><h3>Plataformas</h3><span class="muted small">Deslizá hacia el costado para verlas todas</span></div>
+        <div id="casino-cards" class="ledger"></div>
+        <div class="sheet">
+          <div class="sheet-head"><h3>Últimos movimientos</h3><span class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="search-hist-all" placeholder="Filtrar por ID..."></span></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Fecha / hora</th><th>Plataforma</th><th>ID</th><th class="num">Monto</th><th>Cargado por</th></tr></thead>
+            <tbody id="tbody-hist-all"></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <div id="casino-view" class="hidden">
+        <div class="ctx">
+          <img id="hero-logo" class="ctx-logo hidden" alt="Logo de la plataforma">
+          <div id="hero-fallback" class="ctx-fallback">H</div>
+          <div><span class="pill gold" id="hero-casino-badge">Plataforma · USD</span><h3 id="hero-title" style="margin-top:6px">Plataforma</h3>
+          <p class="muted">Cada carga queda registrada con fecha, hora y responsable.</p></div>
+          <div class="ctx-meta"><span class="pill" id="ctx-cuentas">0 cuentas</span><span class="pill gold" id="ctx-monto">$0</span></div>
+        </div>
+        <div class="figs">
+          <div class="fig"><span class="cap">FTD · cuentas</span><b id="s-ftd">0</b><span class="sub">con depósitos</span></div>
+          <div class="fig"><span class="cap">Depósitos · USD</span><b id="s-monto">$0</b><span class="sub">monto total</span></div>
+          <div class="fig"><span class="cap">Movimientos</span><b id="s-ops">0</b><span class="sub">operaciones</span></div>
+          <div class="fig"><span class="cap">Redepósitos</span><b id="s-red">0</b><span class="sub" id="s-rate">tasa 0%</span></div>
+        </div>
+        <div class="grid2">
+          <div class="sheet">
+            <div class="sheet-head"><h3>Cuentas</h3><span class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="search-cuentas" placeholder="Buscar ID..."></span></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>ID</th><th class="num">N° dep.</th><th class="num">Total USD</th><th>Último</th></tr></thead>
+              <tbody id="tbody-cuentas"></tbody>
+            </table></div>
+          </div>
+          <div class="sheet">
+            <div class="sheet-head"><h3>Historial</h3><span class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="search-hist" placeholder="Filtrar ID..."></span></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>Fecha / hora</th><th>ID</th><th class="num">Monto</th><th>Cargado por</th><th></th></tr></thead>
+              <tbody id="tbody-hist"></tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA AJUSTES -->
+    <div id="view-config" class="hidden">
+      <div id="config-lock" class="card hidden"><p style="margin:0">Este sector es solo para el <b>administrador</b>.</p></div>
+      <div id="config-body" class="grid2">
+        <div class="card">
+          <h3 style="font-family:var(--serif)">Nueva plataforma</h3>
+          <p class="muted small" style="margin:4px 0 12px">Aparece en el riel superior con su logo.</p>
+          <div class="col">
+            <div><label class="lbl" for="new-casino">Nombre</label><input id="new-casino" placeholder="Ej: Hotya"></div>
+            <div><label class="file-label" for="new-casino-logo">Logo (opcional)</label><input id="new-casino-logo" type="file" accept="image/*"></div>
+            <img id="new-casino-preview" class="logo-preview hidden" alt="Vista previa del logo">
+            <div><button id="btn-casino" class="primary">Crear plataforma</button></div>
+          </div>
+          <h4 style="margin-top:18px">Plataformas y logos</h4>
+          <ul id="config-casino-list" class="clean-list"></ul>
+        </div>
+        <div class="card">
+          <h3 style="font-family:var(--serif)">Equipo</h3>
+          <p class="muted small" style="margin:4px 0 12px">Moderadores que cargan · administrador con acceso total.</p>
+          <div class="col">
+            <div><label class="lbl" for="new-user">Usuario</label><input id="new-user" placeholder="Ej: moderador1"></div>
+            <div><label class="lbl" for="new-pass">Contraseña</label><input id="new-pass" type="password" placeholder="Mínimo 4 caracteres"></div>
+            <div><label class="lbl" for="new-role">Rol</label><select id="new-role"><option value="moderador">Moderador · carga depósitos</option><option value="admin">Administrador · acceso total</option></select></div>
+            <div><button id="btn-user" class="primary">Dar acceso</button></div>
+          </div>
+          <h4 style="margin-top:18px">Usuarios actuales</h4>
+          <ul id="users-list" class="clean-list"></ul>
+        </div>
+      </div>
+    </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AÑADIR -->
+<div id="modal" class="overlay hidden">
+  <div class="card modal-card">
+    <div class="modal-title"><span class="medal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><div><h2>Añadir depósito</h2><p class="muted">Se suma al ID si ya existe en esa plataforma.</p></div></div>
+    <div class="field"><label class="lbl" for="f-casino">Plataforma</label><select id="f-casino"></select></div>
+    <div class="field"><label class="lbl" for="f-id">ID de cuenta</label><input id="f-id" placeholder="Ej: 458821" inputmode="numeric"></div>
+    <div class="field"><label class="lbl" for="f-monto">Monto (USD)</label><input id="f-monto" type="number" min="1" step="0.01" placeholder="Ej: 50"></div>
+    <p id="form-error" class="error"></p>
+    <div class="row end"><button id="btn-cancel" class="ghost">Cancelar</button><button id="btn-save" class="primary">Guardar depósito</button></div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR -->
+<div id="confirm-modal" class="overlay hidden">
+  <div class="card modal-card">
+    <div class="modal-title red"><span class="medal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span><div><h2 id="cf-title">Confirmar</h2><p class="muted" id="cf-msg">¿Seguro?</p></div></div>
+    <div class="row end"><button id="cf-no" class="ghost">Cancelar</button><button id="cf-yes" class="danger">Eliminar</button></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
