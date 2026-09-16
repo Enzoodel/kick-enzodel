@@ -12,7 +12,8 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'cambia-este-secreto-en-produccion';
 const ADMIN_USER = process.env.ADMIN_USER || 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASS || 'admin123';
-const USE_PG = !!process.env.DATABASE_URL;
+const DATABASE_URL = process.env.DATABASE_URL || process.env.POSTGRES_URL || '';
+const USE_PG = !!DATABASE_URL;
 
 const app = express();
 app.use(cors());
@@ -26,14 +27,20 @@ const LIKEOP = USE_PG ? 'ILIKE' : 'LIKE';
 if (USE_PG) {
   const { Pool } = require('pg');
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: DATABASE_URL,
     ssl: { rejectUnauthorized: false }
   });
 } else {
-  const { DatabaseSync } = require('node:sqlite');
-  const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data.sqlite');
-  lite = new DatabaseSync(DB_PATH);
-  lite.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
+  // SQLite solo existe en local. En Vercel sin DATABASE_URL la API responde error claro.
+  try {
+    const { DatabaseSync } = require('node:sqlite');
+    const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data.sqlite');
+    lite = new DatabaseSync(DB_PATH);
+    lite.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
+  } catch (e) {
+    console.error('SQLite no disponible:', e.message);
+    lite = null;
+  }
 }
 
 function pgParams(sql) {
@@ -104,6 +111,10 @@ async function initDb() {
       ALTER TABLE casinos ADD COLUMN IF NOT EXISTS logo TEXT;
     `);
   } else {
+    if (!lite) {
+      console.error('Sin base: no hay DATABASE_URL ni SQLite disponible');
+      return;
+    }
     lite.exec(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -183,7 +194,17 @@ function nowTs() {
   return `${n.getFullYear()}-${pad(n.getMonth() + 1)}-${pad(n.getDate())} ${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
 }
 async function ensureReady(req, res, next) {
-  try { await ready; next(); } catch { res.status(500).json({ error: 'Base no disponible' }); }
+  try {
+    await ready;
+    if (USE_PG) {
+      await pool.query('SELECT 1');
+      return next();
+    }
+    if (!lite) return res.status(500).json({ error: 'Sin base de datos: configurá DATABASE_URL (Postgres) en Vercel' });
+    next();
+  } catch {
+    res.status(500).json({ error: 'Base de datos no disponible' });
+  }
 }
 app.use('/api', ensureReady);
 
